@@ -34,15 +34,17 @@ namespace GameThree
             public int tabId;
             public string name;
             public string message;
-            public Color color;
+            public JsonColor color;
         }
         
         [Serializable]
-        public class Color
+        public class JsonColor
         {
-            public byte r;
-            public byte g;
-            public byte b;
+            public int r;
+            public int g;
+            public int b;
+
+            public Color GetColor() => new Color(r / 255f, g / 255f, b / 255f, 1);
         }
         
         public Table tabs = new Table();
@@ -53,6 +55,8 @@ namespace GameThree
         {
             tabs = JsonUtility.FromJson<Table>(textJson.text);
             content = JsonUtility.FromJson<Contents>(textJson.text);
+            
+            Debug.Log(UnityEngine.Color.yellow);
         }
         
 

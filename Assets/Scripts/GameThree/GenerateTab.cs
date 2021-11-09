@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace GameThree
 {
+    //todo: Add Select and Unselect to tabs & zoom for pyramid
     public class GenerateTab : MonoBehaviour
     {
         [SerializeField] private JsonReader jsonReader;
@@ -40,14 +41,9 @@ namespace GameThree
                  Button b = btn.GetComponent<Button>();
 
                 //test if the button is set disabled in json file
-                if (t.enabled == false)
-                {
-                    b.interactable = false;
-                }
-                else
-                {
-                    b.onClick.AddListener(() => { ShowContent(t.id); });
-                }
+                
+                b.interactable = t.enabled;
+                b.onClick.AddListener(() => ShowContent(t.id));
                 
             }
         }
@@ -70,7 +66,7 @@ namespace GameThree
                 content.GetComponentInChildren<Text>().text = t.name;
 
                 //set the color of the button from JSON
-                content.GetComponent<Image>().color = new Color(t.color.r, t.color.g, t.color.b, 255f);
+                content.GetComponent<Image>().color = t.color.GetColor();
                 Button b = content.GetComponent<Button>();
 
                 b.onClick.AddListener(() =>

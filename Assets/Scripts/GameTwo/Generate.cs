@@ -10,6 +10,8 @@ namespace GameTwo
         [SerializeField] private RectTransform prefab;
         [SerializeField] private Transform parent;
         [SerializeField] private Text msg;
+        [SerializeField] private TweeningAnimations tweener;
+        [SerializeField] private PoolManager _pool;
 
         private Vector3 startPosition;
         private Vector3 currentPosition;
@@ -24,7 +26,6 @@ namespace GameTwo
 
         private void GenerateCubes()
         {
-
             ClearCubes();
             currentPosition = startPosition;
             bool isValid = int.TryParse(amount.text, out var nb);
@@ -54,7 +55,11 @@ namespace GameTwo
                 currentPosition.x -= prefabSize.x * (nb * .5f) - prefabSize.x * .5f;
                 for (var i = 0; i < nb; i++)
                 {
-                    Instantiate(prefab, currentPosition, Quaternion.identity, parent);
+                    var spawnedItem = _pool.SpawnRectTransform();
+                    Debug.Log("//. Enable GO");
+                    spawnedItem.gameObject.SetActive(true);
+                    spawnedItem.position = currentPosition;
+                    spawnedItem.SetParent(parent);
                     currentPosition.x += prefabSize.x;
                 }
 
@@ -66,7 +71,11 @@ namespace GameTwo
             currentPosition.x -= prefabSize.x * Mathf.Floor(nb * .5f);
             for (var i = 0; i < nb; i++)
             {
-                Instantiate(prefab, currentPosition, Quaternion.identity, parent);
+                var spawnedItem = _pool.SpawnRectTransform();
+                Debug.Log("//. Enable GO");
+                spawnedItem.gameObject.SetActive(true);
+                spawnedItem.position = currentPosition;
+                spawnedItem.SetParent(parent);
                 currentPosition.x += prefabSize.x;
             }
 
@@ -82,9 +91,11 @@ namespace GameTwo
         
         private void ClearCubes()
         {
+            tweener.KillAllTweens();
+            
             var childs = parent.childCount;
             for (var i = childs - 1; i >= 0; i--) {
-                Destroy(parent.GetChild(i).gameObject);
+                _pool.DeSpawnRectTransform(parent.GetChild(i).GetComponent<RectTransform>());
             }
         }
 

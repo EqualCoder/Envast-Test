@@ -84,6 +84,7 @@ namespace GameTwo
                     }
                 );
         }
-        
+
+        public void KillAllTweens() => DOTween.Kill(pyramid);
     }
 }
