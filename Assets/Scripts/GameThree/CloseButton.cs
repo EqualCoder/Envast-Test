@@ -8,10 +8,11 @@ namespace GameThree
     {
         [SerializeField] private Button b;
         [SerializeField] private GameObject panel;
+        private float _distance=1200;
         void Start()
         {
             //movement and color changer using Tweening
-            b.transform.DOMoveX(b.transform.position.x+600, 1.5f).SetEase(Ease.InFlash)
+            b.transform.DOMoveX(b.transform.position.x+_distance, 1.5f).SetEase(Ease.InFlash)
                 .SetLoops(-1, LoopType.Yoyo);
             b.GetComponent<Image>().DOColor(Random.ColorHSV(), 1.8f).SetLoops(-1, LoopType.Yoyo);
             

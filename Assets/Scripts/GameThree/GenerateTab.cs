@@ -1,77 +1,89 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace GameThree
 {
     public class GenerateTab : MonoBehaviour
     {
         [SerializeField] private JsonReader jsonReader;
-        [SerializeField] private Text txt;
+        [SerializeField] private Transform panelParent;
+        [SerializeField] private Transform sousPanel;
         [SerializeField] private GameObject popup;
-        [SerializeField] private Button b;
-        [SerializeField] private Transform panel;
-        [SerializeField] private Button t1;
-        [SerializeField] private Button t2;
-        private Vector3 _pos = new Vector3(220.7f, 557.4f, 0);
-        private int _k;
+        [SerializeField] private GameObject prefab;
+        [SerializeField] private Transform parent;
 
         private void Start()
         {
-            t1.onClick.AddListener(() =>
-            {
-                _k = 1;
-                Generate();
-            });
-            
-            t2.onClick.AddListener(() =>
-            {
-                _k = 2;
-                Generate();
-            });
+            jsonReader = FindObjectOfType<JsonReader>();
+            Initiliase();
+
         }
 
-        private void Generate()
+        private void Initiliase()
         {
-            // position of the new tabs(buttons)
-            _pos = new Vector3(220.7f, 557.4f, 0);
-            
-            //destroy old tabs
-            foreach (Transform child in panel)
+            var enemiesToTarget = jsonReader.tabs.tabs.OrderBy(t => t.index);
+            foreach (var t in enemiesToTarget)
             {
-                Destroy(child.gameObject);
-            }
-            
-            //generate new ones
-            for (var j = 0; j < jsonReader.content.content.Length; j++)
-            {
-                if (jsonReader.content.content[j].tabId == jsonReader.tabs.tabs[_k].id)
-                {
-                    //Button content (text)
-                    b.GetComponentInChildren<Text>().text = jsonReader.content.content[j].name;
+                // instantiate in the topPanel
+                var btn = Instantiate(prefab, panelParent.transform, false);
 
-                    //Button color 
-                   // b.GetComponent<Image>().DOColor(new Color(JsonReader.content.content[j].color.r/255f,
-                        //JsonReader.content.content[j].color.g/255f, JsonReader.content.content[j].color.b/255f,255), 0);
-                    
-                    b.GetComponent<Image>().color= new Color(jsonReader.content.content[j].color.r/255f,
-                        jsonReader.content.content[j].color.g/255f, jsonReader.content.content[j].color.b/255f,255);
-                    
-                    //Show Up Button
-                    var m = Instantiate(b, _pos, Quaternion.identity, panel);
-                    var j1 = j;
-                    m.onClick.AddListener(() =>
-                    {
-                        popup.SetActive(true);
-                        txt.text = jsonReader.content.content[j1].message;
-                    });
-                    _pos.y = _pos.y - 120;
+                //Put the text on the button
+                btn.GetComponentInChildren<Text>().text = t.title;
+
+                // put a random color on the button
+                btn.GetComponent<Image>().color = new Color(Random.Range(0f, 1f),
+                    Random.Range(0f, 1f), Random.Range(0f, 1f));
+
+                // add an action listener
+                 Button b = btn.GetComponent<Button>();
+
+                //test if the button is set disabled in json file
+                if (t.enabled == false)
+                {
+                    b.interactable = false;
                 }
+                else
+                {
+                    b.onClick.AddListener(() => { ShowContent(t.id); });
+                }
+                
             }
-            
+        }
+
+        private void ShowContent(int i)
+        {
+            foreach (Transform child in sousPanel)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+
+            foreach (var t in jsonReader.content.content)
+            {
+                if (i != t.tabId) continue;
+
+                //instantiate button
+                var content = Instantiate(prefab, sousPanel.transform, false);
+
+                //Put the text on the button
+                content.GetComponentInChildren<Text>().text = t.name;
+
+                //set the color of the button from JSON
+                content.GetComponent<Image>().color = new Color(t.color.r, t.color.g, t.color.b, 255f);
+                Button b = content.GetComponent<Button>();
+
+                b.onClick.AddListener(() =>
+                {
+                    popup.GetComponentInChildren<Text>().text = t.message;
+                    popup.gameObject.SetActive(true);
+                });
+            }
         }
     }
-}
 
+}
+    
 
     
         
